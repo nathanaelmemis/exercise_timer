@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise Timer</title>
+    <link rel="stylesheet" href="exercise_timer.css" type="text/css">
+</head>
+<body>
+    <div class="container">
+        <div class="clockButtonContainer">
+            <p class="clock" id="clock"></p>
+            <button onclick="pauseResumeClock()" class="startPauseResumeButton" id="startPauseResumeButton">Start</button>
+            <button onclick="resetClock()" class="resetButton">Reset</button><br>
+        </div>
+        <div>
+            <div class="remindTimerContainer" id="remindTimerContainer">
+                <span>remind every (hr:m:s)</span>
+                <span class="remindTime" id="remindTime" onclick="adjustRemindTime()">00:05:00</span>
+            </div>
+            <div class="adjustRemindTimerContainer" id="adjustRemindTimerContainer">
+                <span>remind every (hr:m:s)</span>
+                <input type="number" id="hours" step="1">
+                <span>:</span>
+                <input type="number" id="minutes" step="1">
+                <span>:</span>
+                <input type="number" id="seconds" step="1">
+                <button onclick="saveRemindTime()">Save</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="exercise_timer.js"></script>
+</body>
+</html>
