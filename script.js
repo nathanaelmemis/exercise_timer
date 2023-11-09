@@ -30,6 +30,10 @@ function startClock() {
     }
 }
 
+function blinkingRedBackground() {
+    
+}
+
 function updateClock() {
     // Create a new Date object to get the current time
     currentTime = new Date().getTime() - startTime + pauseTime;
@@ -52,6 +56,8 @@ function updateClock() {
         remindTime[3] = ((hoursElement.value * 60 * 60 * 1000) +
                         (minutesElement.value * 60 * 1000) +
                         (secondsElement.value * 1000)) * ++remindCounter
+
+        
 
         audio.addEventListener('ended', function() {
             audio.pause();
