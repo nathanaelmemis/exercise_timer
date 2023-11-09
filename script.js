@@ -30,10 +30,6 @@ function startClock() {
     }
 }
 
-function blinkingRedBackground() {
-    
-}
-
 function updateClock() {
     // Create a new Date object to get the current time
     currentTime = new Date().getTime() - startTime + pauseTime;
@@ -57,12 +53,21 @@ function updateClock() {
                         (minutesElement.value * 60 * 1000) +
                         (secondsElement.value * 1000)) * ++remindCounter
 
-        
+        const body = document.querySelector('body')
+        const startPauseResumeButton = document.querySelector('.startPauseResumeButton')
+        const resetButton = document.querySelector('.resetButton')
+
+        body.style.backgroundColor = '#d24141'
+        startPauseResumeButton.style.backgroundColor = '#d24141'
+        resetButton.style.backgroundColor = '#d24141'
 
         audio.addEventListener('ended', function() {
             audio.pause();
             audio.currentTime = 0
             isPlayingSound = false
+            startPauseResumeButton.style.backgroundColor = '#202020'
+            resetButton.style.backgroundColor = '#202020'
+            body.style.backgroundColor = '#202020'
         });
     }
 }
