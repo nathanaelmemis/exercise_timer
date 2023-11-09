@@ -1,3 +1,5 @@
+const audio = new Audio('sound.mp4');
+
 let startTime = null
 let pauseTime = new Date(0).getTime()
 let currentTime = null
@@ -45,8 +47,6 @@ function updateClock() {
     if (currentTime > remindTime[3] & !isPlayingSound & remindTime[3] > 0) {
         isPlayingSound = true
 
-        const audio = new Audio('sound.mp4');
-        
         audio.play();
 
         remindTime[3] = ((hoursElement.value * 60 * 60 * 1000) +
@@ -55,6 +55,7 @@ function updateClock() {
 
         audio.addEventListener('ended', function() {
             audio.pause();
+            audio.currentTime = 0
             isPlayingSound = false
         });
     }
@@ -89,7 +90,7 @@ function adjustRemindTime() {
     resetClock()
 
     remindTimerContainer.style.display = 'none'
-    adjustRemindTimerContainer.style.display = 'block'
+    adjustRemindTimerContainer.style.display = 'flex'
 
     hoursElement.value = remindTime[0]
     minutesElement.value = remindTime[1]

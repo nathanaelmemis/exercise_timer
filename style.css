@@ -4,7 +4,7 @@
 
 body {
     margin: 0;
-    background-color: white;
+    background-color: #202020;
 }
 
 .container {
@@ -16,6 +16,19 @@ body {
     font-size: 1.125em;
     width: 5em;
     padding: .25em 0;
+    color: #D4D4D4;
+    background-color: #202020;
+    cursor: pointer;
+    border-radius: 25em;
+    border: 0;
+    outline: 2px solid #D4D4D4;
+    padding: .5em;
+    margin: 0 .25em;
+}
+
+.clockButtonContainer button:hover {
+    background-color: #89632A;
+    outline: 2px solid #89632A;
 }
 
 .clock {
@@ -23,27 +36,79 @@ body {
     width: 5.825em;
     font-size: 3em;
     margin: 0 auto .5em auto;
+    color: #D4D4D4;
 }
 
 
+.remindAdjustTimeContainer {
+    margin: 1.25em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 2.125em;
+}
+
 .remindTimerContainer {
-    margin-top: 1.25em;
     font-size: 1.125em;
+    color: #D4D4D4;
 }
 
 .remindTime {
     cursor: pointer;
     width: 1.75em;
     text-decoration: underline;
+    color: #D4D4D4;
+}
+
+.remindTime:hover {
+    color: #89632A;
 }
 
 
 .adjustRemindTimerContainer {
-    margin-top: 1.25em;
     font-size: 1.125em;
     display: none;
+    color: #D4D4D4;
+    align-items: center;
+    justify-content: center;
 }
 
 .adjustRemindTimerContainer input {
-    width: 1.75em;
+    width: 1.25em;
+    color: #D4D4D4;
+    background-color: #202020;
+    border: 0;
+    outline: 1px solid #D4D4D4;
+    font-size: 1em;
+    padding: .125em .25em;
+    margin: 0 .2em;
+}
+
+.adjustRemindTimerContainer input::-webkit-inner-spin-button, 
+.adjustRemindTimerContainer input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.adjustRemindTimerContainer input:focus,
+.adjustRemindTimerContainer input:hover {
+    outline: 2px solid #89632A;
+}
+
+.adjustRemindTimerContainer button {
+    width: 5em;
+    padding: .25em 0;
+    color: #D4D4D4;
+    background-color: #202020;
+    cursor: pointer;
+    border-radius: 25em;
+    border: 0;
+    outline: 2px solid #D4D4D4;
+    padding: .3em;
+    margin: 0 .25em;
+}
+
+.adjustRemindTimerContainer button:hover {
+    background-color: #89632A;
+    outline: 2px solid #89632A;
 }
