@@ -20,7 +20,7 @@ let secondsElement = document.getElementById('seconds')
 
 function startClock() {
     startTime = new Date().getTime()
-    timer = setInterval(updateClock, 100);
+    timer = setInterval(updateClock, 1);
 
     startPauseResumeButton.textContent = 'Pause'
 
