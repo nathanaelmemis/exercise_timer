@@ -1,29 +1,75 @@
-const audio = new Audio('sound.mp4');
+// Contant variables
+// An odd number is chosen to display different numbers.
+const UPDATE_INTERVAL_MS = 107
 
+/**
+ * Audio object for playing the sound.
+ * The trick for sound not playing when tab is inactive bug is to loop the sound with volume set to 0.
+ */
+const audio = new Audio('sound.mp4');
+audio.volume = 0
+audio.loop = true
+
+/**
+ *  Variables for tracking time elapsed.
+ *  Why pauseTime? we cannot get the true elapsed time when we replace startTime with a new Date object.
+ */ 
 let startTime = null
 let pauseTime = new Date(0).getTime()
 let currentTime = null
-let timer = null
-let pauseState = false
-let remindTime = [0, 5, 0, 5 * 60 * 1000]
-let remindCounter = 1
-let isPlayingSound = false
+
+/**
+ * Variables for tracking the remind time.
+ * [hours, minutes, seconds, total time in milliseconds]
+ */
+let remindTime = localStorage.getItem('remindTime') ? JSON.parse(localStorage.getItem('remindTime')) : {
+    hours: 0,
+    minutes: 5,
+    seconds: 0,
+    totalTimeMs: 5 * 60 * 1000
+}
+
+// Reference to the interval so we can clear it when clock is reset.
+let intervalRef = null
+
+// Flags for tracking the state of the clock.
+let isPaused = true
 let isAdjustingRemindTime = false
 
-let clockElement = document.getElementById('clock')
-let startPauseResumeButton = document.getElementById('startPauseResumeButton')
-let remindTimerContainer = document.getElementById('remindTimerContainer')
-let adjustRemindTimerContainer = document.getElementById('adjustRemindTimerContainer')
-let hoursElement = document.getElementById('hours')
-let minutesElement = document.getElementById('minutes')
-let secondsElement = document.getElementById('seconds')
+// DOM element for displaying the clock.
+const clockElement = document.getElementById('clock')
+
+// DOM element for displaying the remind time.
+const remindTimerContainer = document.getElementById('remindTimerContainer')
+const remindTimeElement = document.getElementById('remindTime')
+
+// DOM elements for adjusting the remind time.
+const adjustRemindTimerContainer = document.getElementById('adjustRemindTimerContainer')
+const hoursElement = document.getElementById('hours')
+const minutesElement = document.getElementById('minutes')
+const secondsElement = document.getElementById('seconds')
+
+// DOM elements that change color when the remind time is reached.
+const body = document.querySelector('body')
+const resetButton = document.querySelector('.resetButton')
+const startPauseResumeButton = document.getElementById('startPauseResumeButton')
+
+// Set initial remind time display.
+remindTimeElement.textContent = (remindTime.hours < 10 ? '0' : '') + remindTime.hours + 
+                            ':' + (remindTime.minutes < 10 ? '0' : '') + remindTime.minutes + 
+                            ':' + (remindTime.seconds < 10 ? '0' : '') + remindTime.seconds
 
 function startClock() {
+    // Start audio loop with volume set to 0.
+    audio.play()
+    // Set the start time to the current time.
     startTime = new Date().getTime()
-    timer = setInterval(updateClock, 1);
+    // Update the clock every UPDATE_INTERVAL_MS milliseconds.
+    intervalRef = setInterval(updateClock, UPDATE_INTERVAL_MS);
 
+    // Update UI elements.
     startPauseResumeButton.textContent = 'Pause'
-
+    // If adjusting remind time, reset back to the remind time container.
     if (isAdjustingRemindTime) {
         remindTimerContainer.style.display = 'block'
         adjustRemindTimerContainer.style.display = 'none'
@@ -44,57 +90,44 @@ function updateClock() {
     clockElement.textContent = hours + ':' + minutes + ':' + seconds + ':' + miliseconds;
     document.title = clockElement.textContent
 
-    if (currentTime > remindTime[3] & !isPlayingSound & remindTime[3] > 0) {
-        isPlayingSound = true
-
-        audio.play();
-
-        remindTime[3] = ((hoursElement.value * 60 * 60 * 1000) +
-                        (minutesElement.value * 60 * 1000) +
-                        (secondsElement.value * 1000)) * ++remindCounter
-
-        const body = document.querySelector('body')
-        const startPauseResumeButton = document.querySelector('.startPauseResumeButton')
-        const resetButton = document.querySelector('.resetButton')
+    // Check if the remind time is reached and play sound and change UI elements.
+    if (currentTime > remindTime.totalTimeMs & remindTime.totalTimeMs > 0 & audio.volume == 0) {
+        audio.currentTime = 0
+        audio.volume = 1
 
         body.style.backgroundColor = '#d24141'
         startPauseResumeButton.style.backgroundColor = '#d24141'
         resetButton.style.backgroundColor = '#d24141'
-
-        audio.addEventListener('ended', function() {
-            audio.pause();
-            audio.currentTime = 0
-            isPlayingSound = false
-            startPauseResumeButton.style.backgroundColor = '#202020'
-            resetButton.style.backgroundColor = '#202020'
-            body.style.backgroundColor = '#202020'
-        });
     }
 }
 
+// Toggle the pause/play clock state.
 function pauseResumeClock() {
-    if (pauseState) {
+    if (isPaused) {
         startClock()
         startPauseResumeButton.textContent = 'Pause'
     } else {
-        clearInterval(timer)
+        clearInterval(intervalRef)
         pauseTime = currentTime
         startPauseResumeButton.textContent = 'Continue'
         document.title = 'Exercise Timer'
     }
-    pauseState = !pauseState
+    isPaused = !isPaused
 }
 
 function resetClock() {
-    pauseState = true
-    clearInterval(timer)
+    clearInterval(intervalRef)
     pauseTime = new Date(0).getTime()
+
     clockElement.textContent = '00:00:00:000'
-    remindTime[3] = 5 * 60 * 1000
-    remindCounter = 1
-    isPlayingSound = false
     document.title = 'Exercise Timer'
     startPauseResumeButton.textContent = 'Start'
+
+    isPaused = true
+    audio.pause()
+    startPauseResumeButton.style.backgroundColor = '#202020'
+    resetButton.style.backgroundColor = '#202020'
+    body.style.backgroundColor = '#202020'
 }
 
 function adjustRemindTime() {
@@ -103,53 +136,50 @@ function adjustRemindTime() {
     remindTimerContainer.style.display = 'none'
     adjustRemindTimerContainer.style.display = 'flex'
 
-    hoursElement.value = remindTime[0]
-    minutesElement.value = remindTime[1]
-    secondsElement.value = remindTime[2]
+    hoursElement.value = remindTime.hours
+    minutesElement.value = remindTime.minutes
+    secondsElement.value = remindTime.seconds
 
     isAdjustingRemindTime = true
 }
 
 function saveRemindTime() {
-    let remindTimeElement = document.getElementById('remindTime')
+    // Update the remind time display.
+    remindTimeElement.textContent = (hoursElement.value < 10 ? '0' : '') + hoursElement.value + 
+                            ':' + (minutesElement.value < 10 ? '0' : '') + minutesElement.value + 
+                            ':' + (secondsElement.value < 10 ? '0' : '') + secondsElement.value
 
-    remindTimeElement.textContent = (hoursElement.value < 10 ? '0' : '') + hours.value + 
-                            ':' + (minutesElement.value < 10 ? '0' : '') + minutes.value + 
-                            ':' + (secondsElement.value < 10 ? '0' : '') + seconds.value
-
+    // Update UI elements.
     remindTimerContainer.style.display = 'block'
     adjustRemindTimerContainer.style.display = 'none'
 
-    remindTime[0] = hoursElement.value
-    remindTime[1] = minutesElement.value
-    remindTime[2] = secondsElement.value
-    remindTime[3] = (hoursElement.value * 60 * 60 * 1000) +
-                    (minutesElement.value * 60 * 1000) +
-                    (secondsElement.value * 1000)
+    // Update the remind time object.
+    remindTime.hours = hoursElement.value
+    remindTime.minutes = minutesElement.value
+    remindTime.seconds = secondsElement.value
+    remindTime.totalTimeMs = (hoursElement.value * 60 * 60 * 1000) +
+                            (minutesElement.value * 60 * 1000) +
+                            (secondsElement.value * 1000)
+
+    // Save the remind time to local storage.
+    localStorage.setItem('remindTime', JSON.stringify(remindTime))
 }
 
-hoursElement.addEventListener('input', () => {
-    if (parseInt(hoursElement.value) > 99) {
-        hoursElement.value = '99';
-    } else if (parseInt(hoursElement.value) < 0) {
-        hoursElement.value = '0';
+// Input validation for adjusting the remind time.
+function handleAdjustTimeInput(timeElement, upperTimeLimit) {
+    if (parseInt(timeElement.value) > upperTimeLimit) {
+        timeElement.value = upperTimeLimit.toString();
+    } else if (timeElement.value.trim() === '') {
+        timeElement.value = '0';
+    } else if (parseInt(timeElement.value) < 0) {
+        timeElement.value = '0';
+    } else {
+        timeElement.value = parseInt(timeElement.value).toString();
     }
-});
+}
+hoursElement.addEventListener('input', () => handleAdjustTimeInput(hoursElement, 99));
+minutesElement.addEventListener('input', () => handleAdjustTimeInput(minutesElement, 59));
+secondsElement.addEventListener('input', () => handleAdjustTimeInput(secondsElement, 59));
 
-minutesElement.addEventListener('input', () => {
-    if (parseInt(minutesElement.value) > 59) {
-        minutesElement.value = '59';
-    } else if (parseInt(minutesElement.value) < 0) {
-        minutesElement.value = '0';
-    }
-});
-
-secondsElement.addEventListener('input', () => {
-    if (parseInt(secondsElement.value) > 59) {
-        secondsElement.value = '59';
-    } else if (parseInt(secondsElement.value) < 0) {
-        secondsElement.value = '0';
-    }
-});
-
+// Initialize the clock.
 resetClock()
