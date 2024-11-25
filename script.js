@@ -125,6 +125,7 @@ function resetClock() {
 
     isPaused = true
     audio.pause()
+    audio.volume = 0    
     startPauseResumeButton.style.backgroundColor = '#202020'
     resetButton.style.backgroundColor = '#202020'
     body.style.backgroundColor = '#202020'
